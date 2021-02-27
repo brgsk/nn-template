@@ -3,21 +3,20 @@
 datamodule:
   _target_: src.pl_data.datamodule.MyDataModule
 
+  val_percentage: 0.15
+
   datasets:
     train:
-      _target_: src.pl_data.datamodule.MyDataset
-      name: YourTrainDatasetName
-      path: ${env:YOUR_TRAIN_DATASET_PATH}
-
-    val:
-      - _target_: src.pl_data.datamodule.MyDataset
-        name: YourValDatasetName
-        path: ${env:YOUR_VAL_DATASET_PATH}
+      _target_: src.pl_data.dataset.MyDataset
+      name: MNIST_TRAIN
+      train: True
+      path: ${env:MNIST}
 
     test:
-      - _target_: src.pl_data.datamodule.MyDataset
-        name: YourTestDatasetName
-        path: ${env:YOUR_TEST_DATASET_PATH}
+      - _target_: src.pl_data.dataset.MyDataset
+        name: MNIST_TEST
+        train: False
+        path: ${env:MNIST}
 
   num_workers:
     train: 8
