@@ -2,7 +2,7 @@ from typing import Optional, Sequence
 
 import hydra
 import pytorch_lightning as pl
-from omegaconf import DictConfig, ValueNode
+from omegaconf import DictConfig
 from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision import transforms
 
@@ -14,11 +14,8 @@ class MyDataModule(pl.LightningDataModule):
         num_workers: DictConfig,
         batch_size: DictConfig,
         val_percentage: float,
-        cfg: DictConfig,
     ):
         super().__init__()
-        self.cfg = cfg
-
         self.datasets = datasets
         self.num_workers = num_workers
         self.batch_size = batch_size
@@ -41,7 +38,7 @@ class MyDataModule(pl.LightningDataModule):
         # split dataset
         if stage is None or stage == "fit":
             mnist_train = hydra.utils.instantiate(
-                self.datasets.train, cfg=self.cfg, transform=transform
+                self.datasets.train, transform=transform
             )
             train_length = int(len(mnist_train) * (1 - self.val_percentage))
             val_length = len(mnist_train) - train_length
@@ -50,7 +47,7 @@ class MyDataModule(pl.LightningDataModule):
             )
         if stage is None or stage == "test":
             self.test_datasets = [
-                hydra.utils.instantiate(x, cfg=self.cfg, transform=transform)
+                hydra.utils.instantiate(x, transform=transform)
                 for x in self.datasets.test
             ]
 

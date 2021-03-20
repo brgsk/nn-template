@@ -5,7 +5,6 @@ import pytorch_lightning as pl
 import torch
 import torch.nn.functional as F
 import wandb
-from omegaconf import DictConfig
 from torch.optim import Optimizer
 from torchvision.models import ResNet
 from torchvision.models.resnet import BasicBlock
@@ -23,10 +22,9 @@ class MnistResNet(ResNet):
 
 
 class MyModel(pl.LightningModule):
-    def __init__(self, cfg: DictConfig, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.cfg = cfg
-        self.save_hyperparameters(cfg)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__()
+        self.save_hyperparameters()
 
         self.resnet = MnistResNet()
 
@@ -91,10 +89,10 @@ class MyModel(pl.LightningModule):
         }
 
     def validation_epoch_end(self, outputs: List[Any]) -> None:
-        batch_size = self.cfg.data.datamodule.batch_size.val
+        batch_size = self.hparams.data.datamodule.batch_size.val
         images = []
         for output_element in iterate_elements_in_batches(
-            outputs, batch_size, self.cfg.logging.n_elements_to_log
+            outputs, batch_size, self.hparams.logging.n_elements_to_log
         ):
             rendered_image = render_images(output_element["image"], autoshow=False)
             caption = f"y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
@@ -107,10 +105,10 @@ class MyModel(pl.LightningModule):
         self.logger.experiment.log({"Validation Images": images}, step=self.global_step)
 
     def test_epoch_end(self, outputs: List[Any]) -> None:
-        batch_size = self.cfg.data.datamodule.batch_size.test
+        batch_size = self.hparams.data.datamodule.batch_size.test
         images = []
         for output_element in iterate_elements_in_batches(
-            outputs, batch_size, self.cfg.logging.n_elements_to_log
+            outputs, batch_size, self.hparams.logging.n_elements_to_log
         ):
             rendered_image = render_images(output_element["image"], autoshow=False)
             caption = f"y_pred: {output_element['logits'].argmax()}  [gt: {output_element['y_true']}]"
@@ -139,7 +137,9 @@ class MyModel(pl.LightningModule):
             - None - Fit will run without any optimizer.
         """
         opt = hydra.utils.instantiate(
-            self.cfg.optim.optimizer, params=self.parameters()
+            self.hparams.optim.optimizer, params=self.parameters(), _convert_="partial"
         )
-        scheduler = hydra.utils.instantiate(self.cfg.optim.lr_scheduler, optimizer=opt)
+        scheduler = hydra.utils.instantiate(
+            self.hparams.optim.lr_scheduler, optimizer=opt
+        )
         return [opt], [scheduler]
