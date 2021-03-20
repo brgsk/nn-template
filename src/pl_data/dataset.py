@@ -1,6 +1,6 @@
 from omegaconf import DictConfig, ValueNode
 from torch.utils.data import Dataset
-from torchvision.datasets import MNIST
+from torchvision.datasets import FashionMNIST
 
 
 class MyDataset(Dataset):
@@ -13,7 +13,7 @@ class MyDataset(Dataset):
         self.name = name
         self.train = train
 
-        self.mnist = MNIST(path, train=train, download=True, **kwargs)
+        self.mnist = FashionMNIST(path, train=train, download=True, **kwargs)
 
     def __len__(self) -> int:
         return len(self.mnist)
