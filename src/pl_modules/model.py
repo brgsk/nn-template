@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
 import hydra
+import omegaconf
 import pytorch_lightning as pl
 import torch
 import torch.nn.functional as F
@@ -9,7 +10,7 @@ from torch.optim import Optimizer
 from torchvision.models import ResNet
 from torchvision.models.resnet import BasicBlock
 
-from src.common.utils import iterate_elements_in_batches, render_images
+from src.common.utils import iterate_elements_in_batches, render_images, PROJECT_ROOT
 
 
 class MnistResNet(ResNet):
@@ -143,3 +144,18 @@ class MyModel(pl.LightningModule):
             self.hparams.optim.lr_scheduler, optimizer=opt
         )
         return [opt], [scheduler]
+
+
+@hydra.main(config_path=str(PROJECT_ROOT / "conf"), config_name="default")
+def main(cfg: omegaconf.DictConfig):
+    model: pl.LightningModule = hydra.utils.instantiate(
+        cfg.model,
+        optim=cfg.optim,
+        data=cfg.data,
+        logging=cfg.logging,
+        _recursive_=False,
+    )
+
+
+if __name__ == "__main__":
+    main()

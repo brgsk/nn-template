@@ -1,12 +1,13 @@
 import os
+from pathlib import Path
 from typing import Dict, List, Optional
 
 import dotenv
 import matplotlib.pyplot as plt
 import numpy as np
+import pytorch_lightning as pl
 import torch
 import torchvision
-import pytorch_lightning as pl
 from omegaconf import DictConfig, OmegaConf
 
 
@@ -138,3 +139,15 @@ def log_hyperparameters(
     # disable logging any more hyperparameters for all loggers
     # (this is just a trick to prevent trainer from logging hparams of model, since we already did that above)
     trainer.logger.log_hyperparams = lambda params: None
+
+
+# Load environment variables
+load_envs()
+
+# Set the cwd to the project root
+PROJECT_ROOT: Path = Path(get_env("PROJECT_ROOT"))
+assert (
+    PROJECT_ROOT.exists()
+), "You must configure the PROJECT_ROOT environment variable in a .env file!"
+
+os.chdir(PROJECT_ROOT)
