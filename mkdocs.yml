@@ -8,11 +8,11 @@ nav:
     - Generating your project: getting-started/generation.md
     - Strucure: getting-started/structure.md
   - Integrations:
-      - DVC: integrations/dvc.md
-      - Hydra: integrations/hydra.md
       - PyTorch Lightning: integrations/lightning.md
-      - Streamlit: integrations/streamlit.md
+      - Hydra: integrations/hydra.md
       - Weigth & Biases: integrations/wandb.md
+      - Streamlit: integrations/streamlit.md
+      - DVC: integrations/dvc.md
   - Features:
     - Environment Variables: features/envvars.md
   - Changelog:
